@@ -67,9 +67,9 @@ GEOM_ecto <- function(
   #C     FLAT PLATE
   if(GEOMETRY == 0){
     #C      ASSUME A SQUARE FOR THE MOMENT
-    AHEIT <- (VOL / (SHP[2]*SHP[3])) ^ (1 / 3)
-    AWIDTH <- AHEIT*SHP[2]
-    ALENTH <-  AHEIT*SHP[3]
+    ALENTH <- (VOL * SHP[2] * SHP[3]) ^ (1 / 3)
+    AWIDTH <- ALENTH / SHP[2]
+    AHEIT <-  ALENTH / SHP[3]
     ATOT <- ALENTH * AWIDTH * 2 + ALENTH * AHEIT * 2 + AWIDTH * AHEIT * 2
     AREA <- ATOT
     if(ORIENT == 0){
@@ -79,12 +79,13 @@ GEOM_ecto <- function(
       ASILN <- AWIDTH * AHEIT
       ASILP <- LENTH * AWIDTH
     }
-    AL <- AHEIT
-    if(AWIDTH <= ALENTH){
-      AL <- AWIDTH
-    }else{
-      AL <- ALENTH
-    }
+    # AL <- AHEIT
+    # if(AWIDTH <= ALENTH){
+    #   AL <- AWIDTH
+    # }else{
+    #   AL <- ALENTH
+    # }
+    AL <- VOL ^ (1 / 3)
     R <- ALENTH / 2
     AV <- ATOT  * PTCOND
     AT <- AREA * SKINT

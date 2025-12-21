@@ -74,17 +74,17 @@ C     CYLINDER
       IF (INT(SHAPE) .EQ. 1) THEN
        R1 = (VOL/(SHAPEB*PI*2.))**(1./3.) !R_SKIN
        R2 = R1 + ZFUR ! R_FA
-       ALENTH=SHAPEB*R2*2.
+       ALENTH=(SHAPEB*R1+ZFUR)*2.0
 C      FUR-AIR AREA = END CIRCLE AREA + CIRCLE PERIMETER * LENGTH (LENGTH = 2*D2)
        AREASKIN=2.*PI*R1**2.+2.*PI*R1*SHAPEB*R1*2.
-       ATOT=2.*PI*R2**2.+2.*PI*R2*(SHAPEB*R2*2.)
+       ATOT=2.*PI*R2**2.+2.*PI*R2*ALENTH
        AWIDTH=2.*R2
        AHEIT=AWIDTH
        AREA=ATOT
        IF((INT(SUBQFAT).EQ.1).AND.(MASFAT.GT.0.00))THEN
 C       COMPUTE SUBQ FAT THICKNESS
         FLSHVL = VOL- VOLFAT
-        RFLESH = SQRT(FLSHVL/(PI*ALENTH))
+        RFLESH = (FLSHVL/(SHAPEB*PI*2.))**(1./3.)!SQRT(FLSHVL/(PI*ALENTH))
         FATTHK = R1 - RFLESH
        ELSE
         FLSHVL = VOL
@@ -105,7 +105,7 @@ C       COMPUTE SUBQ FAT THICKNESS
        IF(INT(ORIENT).EQ.3)THEN
         ASIL=2.*R2*ALENTH*sin(ZEN*pi/180.)+pi*R2**2.*cos(ZEN*pi/180.)
        ENDIF
-        D = VOL**(1./3.)
+        D = VOL**(1./3.)+ZFUR
        GO TO 999
       ENDIF
 
@@ -115,22 +115,22 @@ C      BODY, FUR DIMENSIONS FOR CONDUCTION-RADIATION
 C      VOL = 4./3. * PI * R**3
        R1 = ((3./4.)*VOL/PI)**(1./3.)
        R2 = R1+ZFUR
-       D = VOL**(1./3.) 
+       D = VOL**(1./3.)+ZFUR
        IF((INT(SUBQFAT).EQ.1).AND.(MASFAT.GT.0.00))THEN
 C       COMPUTE SUBQ FAT THICKNESS
-        FLSHVL = VOL- VOLFAT
-        RFLESH = ((3.0*FLSHVL)/(4.0*PI))**(1./3.)
+        FLSHVL = VOL - VOLFAT
+        RFLESH = ((3./4.)*FLSHVL/PI)**(1./3.)
         FATTHK = R1 - RFLESH
        ELSE
         FLSHVL = VOL
         RFLESH = R1
         FATTHK = 0.      
        ENDIF
-       IF(FATTHK.GT.0.000000)THEN
-        RFLESH = R1 - FATTHK
-       ELSE
-        RFLESH = R1
-       ENDIF
+C      IF(FATTHK.GT.0.000000)THEN
+C       RFLESH = R1 - FATTHK
+C      ELSE
+C       RFLESH = R1
+C      ENDIF
 C      SKIN SURFACE AREA
        AREASKIN=4.*PI*R1**2. ! SPHERE WITHOUT FUR
        AREA = 4.*PI*R2**2. ! SPHERE WITH FUR
@@ -138,17 +138,17 @@ C      SKIN SURFACE AREA
        ASIL = PI * R2**2.
        ASILN = ASIL
        ASILP = ASIL
-       ALENTH=R1*2.
-       AHEIT=R1*2.
-       AWIDTH=R1*2.
+       ALENTH=R2*2.
+       AHEIT=R2*2.
+       AWIDTH=R2*2.
        GO TO 999
       ENDIF
 
 C     FLAT PLATE
       IF (INT(SHAPE) .EQ. 3) THEN
-       AHEIT=(VOL/(SHAPEB*SHAPEC))**(1./3.)
-       ALENTH=AHEIT*SHAPEB
-       AWIDTH=AHEIT*SHAPEC
+       ALENTH=(VOL*SHAPEB*SHAPEC)**(1./3.) ! skin only to start
+       AWIDTH=ALENTH/SHAPEB
+       AHEIT=ALENTH/SHAPEC
        AREASKIN=ALENTH*AWIDTH*2.+ALENTH*AHEIT*2.+AWIDTH*AHEIT*2.
        ASILN = (AWIDTH+ZFUR*2.) * (ALENTH+ZFUR*2.)
        ASILP = (AWIDTH+ZFUR*2.) * (AHEIT+ZFUR*2.)
@@ -166,17 +166,21 @@ C     FLAT PLATE
        ATOT=(ALENTH+ZFUR*2.)*(AWIDTH+ZFUR*2.)*2.+(ALENTH+ZFUR*2.)*
      & (AHEIT+ZFUR*2.)*2.+(AWIDTH+ZFUR*2.)*(AHEIT+ZFUR*2.)*2.
        AREA=ATOT
+       ! NOW ADD FUR ON FOR FINAL OUTPUT
+       ALENTH=ALENTH+ZFUR*2
+       AWIDTH=AWIDTH+ZFUR*2
+       AHEIT=AHEIT+ZFUR*2
        IF((INT(SUBQFAT).EQ.1).AND.(MASFAT.GT.0.00))THEN
 C       COMPUTE SUBQ FAT THICKNESS
         FLSHVL = VOL- VOLFAT
-        RFLESH = (FLSHVL/(SHAPEB*SHAPEC))**(1./3.)/2.
+        RFLESH = (FLSHVL*SHAPEB*SHAPEC)**(1./3.)/SHAPEB/2.
         FATTHK = R1 - RFLESH
        ELSE
         FLSHVL = VOL
         RFLESH = R1
         FATTHK = 0.      
        ENDIF       
-        D = VOL**(1./3.)
+        D = VOL**(1./3.)+ZFUR
        GO TO 999
       ENDIF
       
@@ -190,9 +194,9 @@ C       SO B = ((3*V)/(4*PI*G))**(1/3)
         BSEMIN=(((3./(4.*SHAPEB))*VOL)/PI)**(1./3.)
         CSEMIN=BSEMIN
         ASEMAJ=SHAPEB*(BSEMIN)
-        ALENTH=ASEMAJ*2.
-        AHEIT=BSEMIN*2.
-        AWIDTH=CSEMIN*2.
+        ALENTH=ASEMAJ*2.+ZFUR*2.
+        AHEIT=BSEMIN*2.+ZFUR*2.
+        AWIDTH=CSEMIN*2.+ZFUR*2.
         E = ((ASEMAJ**2. - CSEMIN**2)**0.5 )/ASEMAJ ! ECCENTRICITY
         ASILN = PI * (ASEMAJ + ZFUR) * (BSEMIN + ZFUR)
         ASILP = PI * (BSEMIN + ZFUR) * (CSEMIN + ZFUR)
@@ -254,7 +258,7 @@ C       AREA AT THE FUR TIPS
          ENDIF
         ENDIF
         ATOT = AREA
-        D = VOL**(1./3.)
+        D = VOL**(1./3.)+ZFUR
         FLSHVL = VOL
         RFLESH = R1
         FATTHK = 0.    
@@ -266,9 +270,9 @@ C       ASSUMING A PROLATE SPHEROID
 C       VOL = 4/3* PI*A*B*C
 C       SO VOL = 4/3* PI*G*B*B*B, ASSUMING C = B, A = G*B
 C       SO B = (((3/(4*G))*VOL)/PI)^(1/3)
-        FLSHBSEMIN = (((3.*FLSHVL)/(4*SHAPEB*PI)))**(1./3.)
-        FLSHCSEMIN = FLSHBSEMIN
-        FLSHASEMAJ = SHAPEB*FLSHBSEMIN
+        FLSHBSEMIN=(((3./(4.*SHAPEB))*FLSHVL)/PI)**(1./3.)
+        FLSHCSEMIN=FLSHBSEMIN
+        FLSHASEMAJ=SHAPEB*(FLSHBSEMIN)
 C       VOLFAT=(4./3.* PI*(FLSHASEMAJ+X)*(FLSHBSEMIN+X)^2)-FLSHVOL, WHERE X IS THE FAT THICKNESS.
 C       REMEMBERING THAT FLSHASEMAJ= SHAPEB*FLSHBSEMIN, AND FACTORING:
 C       X^3 + ((SHAPEB*FLSHBSEMIN)+(2*FLSHBSEMIN))X^2 + (2*SHAPEB*FLSHBSEMIN^2)+(FLSHBSEMIN^2))X + [(SHAPEB*FLSHBSEMIN^3)-(((VOLFAT+FLSHVL)*3)/(4*PI))] = 0
@@ -317,10 +321,9 @@ C        SETTING FATTHK TO 0.0
         ASEMAJ=FLSHASEMAJ+FATTHK
         BSEMIN=FLSHBSEMIN+FATTHK
         CSEMIN=BSEMIN
-        ASEMAJ=SHAPEB*(BSEMIN)
-        ALENTH=ASEMAJ*2.
-        AHEIT=BSEMIN*2.
-        AWIDTH=CSEMIN*2.
+        ALENTH=ASEMAJ*2.+ZFUR*2.
+        AHEIT=BSEMIN*2.+ZFUR*2.
+        AWIDTH=CSEMIN*2.+ZFUR*2.
         E = ((ASEMAJ**2. - CSEMIN**2.)**0.5 )/ASEMAJ ! ECCENTRICITY
         ASILN = PI * (ASEMAJ + ZFUR) * (BSEMIN + ZFUR)
         ASILP = PI * (BSEMIN + ZFUR) * (CSEMIN + ZFUR)
@@ -381,7 +384,7 @@ C       AREA AT THE FUR TIPS
          ENDIF
         ENDIF
         ATOT = AREA
-        D = VOL**(1./3.)
+        D = VOL**(1./3.)+ZFUR
        ENDIF
        GO TO 999
       ENDIF

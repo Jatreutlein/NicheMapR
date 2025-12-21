@@ -261,7 +261,7 @@ C      GATES EQN. 9.49, ASSUMES TURBULENT FLOW)
 C  **************************************************************************
 
 C     CALCULATING THE HEAT TRANSFER COEFFICIENT, HC  (NU=HC*D/KAIR)
-c      HC=(NUFORCED*THCOND)/D
+      HCFOR=(NUFORCED*THCOND)/D
 
 C     CALCULATING THE CONVECTIVE HEAT LOSS
 

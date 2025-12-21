@@ -378,6 +378,7 @@ C      CORRECT FASKY FOR % VEGETATION SHADE OVERHEAD, ASHADE
      &   SHAPEB,SHAPEC,DHARA,RHOARA,PCOND,SAMODE,ORIENT,Z,GEOMout)
 
         !# output
+        D = GEOMout(2)
         ASEMAJ = GEOMout(16) !# semimajor axis length, m
         BSEMIN = GEOMout(17) !# b semiminor axis length, m
         CSEMIN = GEOMout(18) !# c semiminor axis length, m (currently only prolate spheroid)
@@ -389,7 +390,7 @@ C      CORRECT FASKY FOR % VEGETATION SHADE OVERHEAD, ASHADE
         RSKIN = R1 !# body radius (including fat), m
         RFLESH = R1 - FATTHK !# body radius flesh only (no fat), m
         RFUR = R1 + ZFUR !# body radius including fur, m
-        D = 2. * RFUR !# diameter, m
+        !D = 2. * RFUR !# diameter, m
         RRAD = RSKIN + (XR * ZFUR) !# effective radiation radius, m
         IF(INT(SHAPE).NE.4)THEN ! For cylinder and sphere geometries
           RFURCMP=RSKIN+ZFURCOMP
@@ -695,6 +696,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
      &   SHAPEB,SHAPEC,DHARA,RHOARA,PCOND,SAMODE,ORIENT,Z,GEOMout)
 
         !# output
+        D = GEOMout(2)
         ASEMAJ = GEOMout(16) !# semimajor axis length, m
         BSEMIN = GEOMout(17) !# b semiminor axis length, m
         CSEMIN = GEOMout(18) !# c semiminor axis length, m (currently only prolate spheroid)
@@ -706,7 +708,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
         RSKIN = R1 !# body radius (including fat), m
         RFLESH = R1 - FATTHK !# body radius flesh only (no fat), m
         RFUR = R1 + ZFUR !# body radius including fur, m
-        D = 2. * RFUR !# diameter, m
+        !D = 2. * RFUR !# diameter, m
         RRAD = RSKIN + (XR * ZFUR) !# effective radiation radius, m
         IF(INT(SHAPE).NE.4)THEN ! For cylinder and sphere geometries
           RFURCMP=RSKIN+ZFURCOMP
@@ -720,7 +722,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
           BLCMP=RFUR ! Note that this value is never used if conduction not being modeled, but need to have a value for the calculations
         ENDIF
 
-        LEN = ALENTH !# length, m
+        LEN = ALENTH-2.0*ZFUR !# length, m (ALENTH is now with insulation, but LEN should be without)
 
         !# Correcting volume to account for subcutaneous fat
         if((INT(SUBQFAT).EQ.1).AND.(FATTHK.GT.0.0))THEN
@@ -948,7 +950,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
 
        !# output
        VOL = GEOMout(1) !# volume, m3
-       !D = GEOMout(2) !# characteristic dimension for convection, m
+       D = GEOMout(2) !# characteristic dimension for convection, m
        MASFAT = GEOMout(3) !# mass body fat, kg
        VOLFAT = GEOMout(4) !# volume body fat, m3
        ALENTH = GEOMout(5) !# length, m
@@ -969,7 +971,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
        CONVAR = GEOMout(20) !# area for convection (total area minus ventral area, as determined by PCOND), m2
        R1 = GEOMout(21) !# shape-specific core-skin radius in shortest dimension, m
        R2 = GEOMout(22) !# shape-specific core-fur/feather interface radius in shortest dimension, m
-       D = 2 * (R1 + ZFUR)
+       !D = 2 * (R1 + ZFUR)
 
       IF(FURTST.GT.0.0)THEN
           ARADD = ATOT
