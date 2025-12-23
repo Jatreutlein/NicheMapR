@@ -56,13 +56,15 @@ SOLAR_ecto <- function(
 
   #C     CHECKING FOR SCATTERED SKYLIGHT ONLY WHEN SUN BELOW HORIZON
   ZENITH <- ZEN * 180 / PI
+  QDIRECT <- QSOLR * (1 - PDIF)
+  QDIFFUSE <- QSOLR * PDIF
   #C     DIRECT BEAM COMPONENT
   if(ZENITH < 90){
     #C      DIRECT BEAM (NORMAL TO THE DIRECT BEAM)
     if(LIVE == 0){ # DON'T MAKE IT ADJUST POSTURE, IT'S DEAD!
-      QNORM <- QSOLR
+      QNORM <- QDIRECT
     }else{
-      QNORM <- (QSOLR / cos(ZEN))
+      QNORM <- (QDIRECT / cos(ZEN))
     }
     if(QNORM > 1367){
       #C       MAKING SURE THAT LOW SUN ANGLES DON'T LEAD TO SOLAR VALUES
@@ -72,15 +74,15 @@ SOLAR_ecto <- function(
     if(ZENITH >= 90){
       QNORM <- 0
     }
-    QSDIR <- ABSAN * ASIL * (1 - PDIF) * QNORM * (1 - (SHADE / 100))
+    QSDIR <- ABSAN * ASIL * QNORM * (1 - (SHADE / 100))
   }else{
     QSDIR <- 0.00
     QNORM <- 0.00
   }
 
   #C      DIFFUSE COMPONENTS (SKY AND SUBSTRATE)
-  QSOBJ <- ABSAN * FATOBJ * (ATOT - AT / 2) * PDIF * QSOLR
-  QSSKY <- ABSAN * FATOSK * (ATOT - AT / 2) * PDIF * QSOLR * (1 - (SHADE / 100))
+  QSOBJ <- ABSAN * FATOBJ * (ATOT - AT / 2) * QDIFFUSE
+  QSSKY <- ABSAN * FATOSK * (ATOT - AT / 2) * QDIFFUSE * (1 - (SHADE / 100))
   QSRSB <- ABSAN * FATOSB * (ATOT - AV - AT / 2) * (1 - ABSSB) * QSOLR * (1 - (SHADE / 100))
   QSDIFF <- QSSKY + QSRSB + QSOBJ
   QSOLAR <- QSDIR + QSDIFF

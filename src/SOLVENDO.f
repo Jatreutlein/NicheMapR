@@ -7,9 +7,9 @@ C     USING endo_devel.R
 
       implicit none
 
-      DOUBLE PRECISION ABSAND,ABSANV,ABSSB,AHEIT,AIRML1,AIRML2,AIRVOL
-      DOUBLE PRECISION AIRVOL_MAX,AK1,AK1_INC,AK1_LAST,AK1_MAX,AK2
-      DOUBLE PRECISION ALENTH,AMASS,ANDENS,ANU,AREACND,ARADD,ARADV
+      DOUBLE PRECISION ABSAND,ABSANV,ABSSB,ACOND,AHEIT,AIRML1,AIRML2
+      DOUBLE PRECISION AIRVOL,AIRVOL_MAX,AK1,AK1_INC,AK1_LAST,AK1_MAX
+      DOUBLE PRECISION AK2,ALENTH,AMASS,ANDENS,ANU,AREACND,ARADD,ARADV
       DOUBLE PRECISION AREASKIN,ASEMAJ,ASIL,ASILN,ASILP,ATOT,AWIDTH
       DOUBLE PRECISION BP,BSEMIN,BRENTOL,CD,CO2GAS,CONVAR
       DOUBLE PRECISION CONVOUT,CONVSK,CSEMIN,CZ,D,DELTAR,DHAIRD,DHAIRV
@@ -256,6 +256,7 @@ C     USING endo_devel.R
        CONVAR = GEOMout(20) !# area for convection (total area minus ventral area, as determined by PCOND), m2
        R1 = GEOMout(21) !# shape-specific core-skin radius in shortest dimension, m
        R2 = GEOMout(22) !# shape-specific core-fur/feather interface radius in shortest dimension, m
+       ACOND = ATOT*PCOND
 
        !### SOLAR, solar radiation
 
@@ -276,7 +277,7 @@ C      CORRECT FASKY FOR % VEGETATION SHADE OVERHEAD, ASHADE
        FASKY = FSKREF - FAVEG
        FAGRD = FGDREF
 
-       CALL SOLAR_ENDO(ATOT, ABSAND, ABSANV, ABSSB, ASIL, PCTDIF,
+       CALL SOLAR_ENDO(ATOT, ACOND, ABSAND, ABSANV, ABSSB, ASIL, PCTDIF,
      &  QNORM, SHADE, QSOLR, FASKY, FAVEG, SOLARout)
 
        QSOLAR = SOLARout(1) !# total (global) solar radiation (W) QSOLAR,QSDIR,QSSKY,QSRSB,QSDIFF,QDORSL,QVENTR
@@ -574,7 +575,7 @@ c     &  (TC.LE.(TC_MIN+TC_INC)))THEN
        CONVAR = GEOMout(20) !# area for convection (total area minus ventral area, as determined by PCOND), m2
        R1 = GEOMout(21) !# shape-specific core-skin radius in shortest dimension, m
        R2 = GEOMout(22) !# shape-specific core-fur/feather interface radius in shortest dimension, m
-
+       ACOND = ATOT*PCOND
        !### SOLAR, solar radiation
 
        !# solar radiation normal to sun's rays
@@ -594,7 +595,7 @@ C      CORRECT FASKY FOR % VEGETATION SHADE OVERHEAD, ASHADE
        FASKY = FSKREF - FAVEG
        FAGRD = FGDREF
 
-       CALL SOLAR_ENDO(ATOT, ABSAND, ABSANV, ABSSB, ASIL, PCTDIF,
+       CALL SOLAR_ENDO(ATOT, ACOND, ABSAND, ABSANV, ABSSB, ASIL, PCTDIF,
      &  QNORM, SHADE, QSOLR, FASKY, FAVEG, SOLARout)
 
        QSOLAR = SOLARout(1) !# total (global) solar radiation (W) QSOLAR,QSDIR,QSSKY,QSRSB,QSDIFF,QDORSL,QVENTR
