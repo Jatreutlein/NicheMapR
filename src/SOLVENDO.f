@@ -59,8 +59,9 @@ C     USING endo_devel.R
      & INPUT(99),TREG(17),MORPH(20),ENBAL(10),MASBAL(10)
 
       PI = ACOS(-1.0d0)
-      ZBRENTout=0.
-      QRESP=0.
+      ZBRENTout=0.0D0
+      ZBRENTin=0.0D0
+      QRESP=0.0D0
       QGEN=input(1)
       QBASAL=input(2)
       TA=input(3)
@@ -165,34 +166,34 @@ C     USING endo_devel.R
       TSKINMAX=TC ! initialise
       Q10mult=1. ! initialise
       PANT_COST = 0.D0 ! initialise
-      D=0.
-      AHEIT=0.
-      AK1_LAST=0.
-      ALENTH=0.
-      AREACND=0.
-      VOL=0.
-      VMULT=0.
-      TLUNG=0.
-      TC_LAST=0.
-      SHAPEB_LAST=0.
-      R2=0.
-      R1=0.
-      PCTWET_LAST=0.
-      PANT_LAST=0.
-      MASFAT=0.
-      KFURCMPRS=0.
-      FLSHVL=0.
-      FATTHK=0.
-      FAGRD=0.
-      DMULT=0.
-      CONVSK=0.
-      CONVAR=0.
-      AWIDTH=0.
-      ASILP=0.
-      ASILN=0.
-      AREASKIN=0.
-      AREACND=0.
-      KEFARA = (/0.,0.,0./)
+      D=0.0D0
+      AHEIT=0.0D0
+      AK1_LAST=0.0D0
+      ALENTH=0.0D0
+      AREACND=0.0D0
+      VOL=0.0D0
+      VMULT=0.0D0
+      TLUNG=0.0D0
+      TC_LAST=0.0D0
+      SHAPEB_LAST=0.0D0
+      R2=0.0D0
+      R1=0.0D0
+      PCTWET_LAST=0.0D0
+      PANT_LAST=0.0D0
+      MASFAT=0.0D0
+      KFURCMPRS=0.0D0
+      FLSHVL=0.0D0
+      FATTHK=0.0D0
+      FAGRD=0.0D0
+      DMULT=0.0D0
+      CONVSK=0.0D0
+      CONVAR=0.0D0
+      AWIDTH=0.0D0
+      ASILP=0.0D0
+      ASILN=0.0D0
+      AREASKIN=0.0D0
+      AREACND=0.0D0
+      KEFARA = (/0.0D0,0.0D0,0.0D0/)
       ZFURD_REF=ZFURD
       ZFURV_REF=ZFURV
       IF(PZFUR.GT.0.)THEN
@@ -653,26 +654,26 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
          if(S==1)THEN
           FASKY = FASKYREF*2.!/(FASKYREF+FAVEGREF) ! proportion of upward view that is sky
           FAVEG = FAVEGREF*2.!/(FASKYREF+FAVEGREF) ! proportion of upward view that is vegetation (shade)
-          FAGRD = 0.0
-          FABUSH = 0.0
+          FAGRD = 0.0D0
+          FABUSH = 0.0D0
           QSLR = 2.*QSDIR+((QSSKY/FASKYREF)*FASKY) ! direct x 2 because assuming sun in both directions, and unadjusting QSSKY for config factor imposed in SOLAR_ENDO and back to new larger one in both directions
          else
-          FASKY = 0.0
-          FAVEG = 0.0
-          FAGRD = FAGRDREF*2.!/(FAGRDREF+FABUSHREF)
-          FABUSH = FABUSHREF*2.!/(FAGRDREF+FABUSHREF)
-          QSLR = (QVENTR/(1. - FASKYREF - FAVEGREF))*(1.-(2.*PCOND)) ! unadjust by config factor imposed in SOLAR_ENDO to have it coming in both directions, but also cutting down according to fractional area conducting to ground (in both directions)
+          FASKY = 0.0D0
+          FAVEG = 0.0D0
+          FAGRD = FAGRDREF*2.D0!/(FAGRDREF+FABUSHREF)
+          FABUSH = FABUSHREF*2.D0!/(FAGRDREF+FABUSHREF)
+          QSLR = (QVENTR/(1.D0 - FASKYREF - FAVEGREF))*(1.-(2.*PCOND)) ! unadjust by config factor imposed in SOLAR_ENDO to have it coming in both directions, but also cutting down according to fractional area conducting to ground (in both directions)
         ENDIF
         else
-         QSLR = 0.0
+         QSLR = 0.0D0
          if(S==1)then
           FASKY = FASKYREF*2.!/(FASKYREF+FAVEGREF)
           FAVEG = FAVEGREF*2.!/(FASKYREF+FAVEGREF)
-          FAGRD = 0.0
-          FABUSH = 0.0
+          FAGRD = 0.0D0
+          FABUSH = 0.0D0
          else
-          FASKY = 0.0
-          FAVEG = 0.0
+          FASKY = 0.0D0
+          FAVEG = 0.0D0
           FAGRD = FAGRDREF*2.!/(FAGRDREF+FABUSHREF)
           FABUSH = FABUSHREF*2.!/(FAGRDREF+FABUSHREF)
          ENDIF
@@ -736,8 +737,8 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
          AREACND = ATOT * (PCOND * 2.)
          CD = (AREACND * KSUB) / 0.025 !# assume conduction happens from 2.5 cm depth
         ELSE  !# doing dorsal side, no conduction. No need to adjust areas used for convection.
-         AREACND = 0.
-         CD = 0.
+         AREACND = 0.D0
+         CD = 0.D0
         ENDIF
         
         !# package up inputs
@@ -753,13 +754,13 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
 
         !# set IPT, the geometry assumed in SIMULSOL: 1 = cylinder, 2 = sphere, 3 = ellipsoid
         if((INT(SHAPE).eq.1).or.(INT(SHAPE).eq.3))THEN
-         IPT = 1.
+         IPT = 1.D0
         ENDIF
         if(INT(SHAPE).eq.2)THEN
-         IPT = 2.
+         IPT = 2.D0
         ENDIF
         If(INT(SHAPE).eq.4)THEN
-         IPT = 3.
+         IPT = 3.D0
         ENDIF
 
         !# call SIMULSOL
@@ -776,7 +777,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
        GEND = SIMULSOLout(1, 5)
        GENV = SIMULSOLout(2, 5)
        DMULT = FASKYREF + FAVEGREF
-       VMULT = 1. - DMULT !# assume that reflectivity of veg below equals reflectivity of soil so VMULT left as 1 - DMULT
+       VMULT = 1.0D0 - DMULT !# assume that reflectivity of veg below equals reflectivity of soil so VMULT left as 1 - DMULT
        X = GEND * DMULT + GENV * VMULT !# weighted estimate of metabolic heat generation
        QSUM = X
 
@@ -803,7 +804,7 @@ C      BP = CONVout(14) !# barometric pressure (Pa)
         ENDIF
         TOL = QBASAL * BRENTOL
         ZBRENTin = (/TA, O2GAS, N2GAS, CO2GAS, BP, QMIN, RQ, TLUNG,
-     &   GMASS, EXTREF, RH, RELXIT, 1.D0, TAEXIT, QSUM, PANT, RP_CO2/)
+     &   GMASS, EXTREF, RH, RELXIT, 1.0D0, TAEXIT, QSUM, PANT, RP_CO2/)
 
         !# call ZBRENT subroutine which calls RESPFUN
         CALL ZBRENT_ENDO(QM1, QM2, TOL, ZBRENTin, ZBRENTout)

@@ -56,14 +56,14 @@ C     EPS IS MACHINE FLOATING POINT PRECISION
       PANT=INPUT(16)
       RP_CO2=INPUT(17)
       
-      XM=0.
-      W1=0.
-      E=0.
-      C=0.
+      XM=0.0D0
+      W1=0.0D0
+      E=0.0D0
+      C=0.0D0
 C     PARAMETER (ITMAX=20,EPS=3.E-8)
       ITMAX=300
       EPS=3.E-8
-      DIAGNOS = 0.
+      DIAGNOS = 0.0D0
       A=QM1
       B=QM2
 
