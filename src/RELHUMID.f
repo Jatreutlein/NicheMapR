@@ -45,8 +45,8 @@ c     Dry bulb temperature is the 2m Tair
       DB = OUT(2)
 
 c     call dryair to get atmospheric pressure, patmos, from altitude, alt, etc. for reference height
-      call DRYAIR(DB,BP,ALT,PATMOS,DENSTY,VISDYN,VISKIN,DIFVPR,
-     *THCOND,HTOVPR,TCOEFF,GGROUP)
+       CALL DRYAIR(DB,BP,ALT,PATMOS,20.95D+0,79.02D+0,0.0412D+0,DENSTY,
+     *  VISDYN,VISKIN,DIFVPR,THCOND,HTOVPR,TCOEFF,GGROUP)
 
       RH = SIOUT(3)
       if(RH.gt.100.)then
@@ -59,8 +59,8 @@ c     get the vapor pressure, e, at Ta, 2m
 c     get the saturation vapor pressure, esat, at Tlocal
       RH = 100.
       DB = SIOUT(2)
-      call WETAIR(DB,WB,RH,DP,BP,E,ESAT,VD,RW,TVIR,TVINC,DENAIR,CP,
-     *  WTRPOT)
+       CALL DRYAIR(DB,BP,ALT,PATMOS,20.95D+0,79.02D+0,0.0412D+0,DENSTY,
+     *  VISDYN,VISKIN,DIFVPR,THCOND,HTOVPR,TCOEFF,GGROUP)
 c     Definition of relative humidity using the vapor density at reference height
       RHLOCL = (vapref/esat)* 100.
 
