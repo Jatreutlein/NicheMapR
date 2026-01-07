@@ -144,13 +144,14 @@ C     end if
      &       part_total(ii)+PJOINs(1)
             TRUNKL=GEOM_out(5)
           end if
+          PJOINs(i) = min(PJOINs(i), 0.2D0) ! cap joins at max of 20%
       end do
 
       ! Update current surface areas
       do i = 1,num_parts
           call GEOM_ENDO(MASSs(i),DENSITYs(i),DENSITYs(i),FATPCTs(i),
      &     SHAPEs(i),0D1,SUBQFATs(i),SHAPE_Bs(i),SHAPE_Bs(i),
-     &     (DHAIRDs(ii)+DHAIRVs(i))/2D1,(INSDENDs(i)+INSDENVs(i))/
+     &     (DHAIRDs(i)+DHAIRVs(i))/2D1,(INSDENDs(i)+INSDENVs(i))/
      &     2D1,PJOINs(i),0D1,0D1,0D1,GEOM_out)
           SA_currents(i)=GEOM_out(8)*(1.0-PJOINs(i))
       end do

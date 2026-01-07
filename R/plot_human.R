@@ -4,40 +4,40 @@
 #' @encoding UTF-8
 #' @param MASS = 70
 #' @param HEIGHT = 170
-#' @param MASSFRACs = c(0.07609801, 0.50069348, 0.04932963, 0.16227462)
+#' @param MASSFRACs = c(0.0761, 0.501, 0.049, 0.162)
 #' @param DENSITYs = rep(1050, 4)
 #' @param INSDEPDs = c(1e-02, rep(6e-03, 3))
 #' @param INSDEPVs = c(1e-09, rep(6e-03, 3))
 #' @param SUBQFATs = rep(1, 4)
-#' @param FATPCTs = c(5, 36, 10, 23)
-#' @param SHAPE_Bs = c(1.6, 1.9, 11, 7.0)
+#' @param FATPCTs = c(5, 36, 10, 23) * 0.7
+#' @param SHAPE_Bs = c(1.6, 1.9, 12, 7.0)
 #' @param DHAIRDs = c(7.5e-5, rep(1E-06, 3))
 #' @param DHAIRVs = c(7.5e-5, rep(1E-06, 3))
 #' @param LHAIRDs = c(50e-3, 50e-3, 50e-3, 50e-3)
 #' @param LHAIRVs = c(1e-9, 50e-3, 50e-3, 50e-3)
 #' @param INSDENDs = rep(3e+08, 4)
 #' @param INSDENVs = c(3e+05, rep(3e+08, 3))
-#' @param PJOINs = c(0.02591961, 0.07879298, 0.01850589, 0.03333333)
-#' @usage plot_person(MASS = 70, HEIGHT = 170, INSDEPDs = c(1e-02, rep(6e-03, 3)), INSDEPVs = c(1e-09, rep(6e-03, 3)), FATPCTs = c(5, 36, 10, 23), SHAPE_Bs = c(1.6, 1.9, 11, 7.0))
+#' @param PJOINs = c(0.02666667, 0.08088128, 0.02000000, 0.03333333)
+#' @usage plot_person(MASS = 70, HEIGHT = 170, INSDEPDs = c(1e-02, rep(6e-03, 3)), INSDEPVs = c(1e-09, rep(6e-03, 3)), FATPCTs = c(5, 36, 10, 23), SHAPE_Bs = c(1.6, 1.85, 12.5, 6.5))
 #' @export
 plot_human <- function(
     MASS = 70,
     HEIGHT = 170,
-    MASSFRACs = c(0.07609801, 0.50069348, 0.04932963, 0.16227462),
+    MASSFRACs = c(0.0761, 0.501, 0.049, 0.162),
     SHAPEs = c(4, 1, 1, 1),
     DENSITYs = rep(1050, 4),
     INSDEPDs = c(1e-02, rep(6e-03, 3)),
     INSDEPVs = c(1e-09, rep(6e-03, 3)),
     SUBQFATs = rep(1, 4),
-    FATPCTs = c(5, 36, 10, 23),
-    SHAPE_Bs = c(1.6, 1.9, 11, 7.0),
+    FATPCTs = c(5, 36, 10, 23) * 0.7,
+    SHAPE_Bs = c(1.6, 1.9, 12, 7.0),
     DHAIRDs = c(7.5e-5, rep(1E-06, 3)),
     DHAIRVs = c(7.5e-5, rep(1E-06, 3)),
     LHAIRDs = c(50e-3, 50e-3, 50e-3, 50e-3),
     LHAIRVs = c(1e-9, 50e-3, 50e-3, 50e-3),
     INSDENDs = rep(3e+08, 4),
     INSDENVs = c(3e+05, rep(3e+08, 3)),
-    PJOINs = c(0.02591961, 0.07879298, 0.01850589, 0.03333333)
+    PJOINs = c(0.02666667, 0.08088128, 0.02000000, 0.03333333)
 ){
 
   if (!require("plotrix", quietly = TRUE)) {
@@ -67,7 +67,7 @@ plot_human <- function(
   colnames(GEOM.trunks) <- GEOM.lab
   colnames(GEOM.arms) <- GEOM.lab
   colnames(GEOM.legs) <- GEOM.lab
-  AREA <- max(GEOM.heads$ATOT + GEOM.trunks$ATOT + GEOM.arms$ATOT * 2 + GEOM.legs$ATOT * 2)
+  AREA <- GEOM.heads$ATOT + GEOM.trunks$ATOT + GEOM.arms$ATOT * 2 + GEOM.legs$ATOT * 2
 
   head.ASEMAJ <- GEOM.heads$ASEMAJ
   head.BSEMIN <- GEOM.heads$BSEMIN
@@ -76,23 +76,23 @@ plot_human <- function(
   head.INSDEPV <- INSDEPVs[1]
   head.FATTHK <- GEOM.heads$FATTHK
 
-  trunk.ALENGTH <- GEOM.trunks$ALENTH
-  trunk.AWIDTH <- GEOM.trunks$AWIDTH
-  trunk.AHEIGHT <- GEOM.trunks$AHEIT
+  trunk.ALENGTH <- GEOM.trunks$ALENTH - INSDEPDs[2] - INSDEPVs[2]
+  trunk.AWIDTH <- GEOM.trunks$AWIDTH - INSDEPDs[2] - INSDEPVs[2]
+  trunk.AHEIGHT <- GEOM.trunks$AHEIT - INSDEPDs[2] - INSDEPVs[2]
   trunk.INSDEPD <- INSDEPDs[2]
   trunk.INSDEPV <- INSDEPVs[2]
   trunk.FATTHK <- GEOM.trunks$FATTHK
 
-  arm.ALENGTH <- GEOM.arms$ALENTH
-  arm.AWIDTH <- GEOM.arms$AWIDTH
-  arm.AHEIGHT <- GEOM.arms$AHEIT
+  arm.ALENGTH <- GEOM.arms$ALENTH - INSDEPDs[3] - INSDEPVs[3]
+  arm.AWIDTH <- GEOM.arms$AWIDTH - INSDEPDs[3] - INSDEPVs[3]
+  arm.AHEIGHT <- GEOM.arms$AHEIT - INSDEPDs[3] - INSDEPVs[3]
   arm.INSDEPD <- INSDEPDs[3]
   arm.INSDEPV <- INSDEPVs[3]
   arm.FATTHK <- GEOM.arms$FATTHK
 
-  leg.ALENGTH <- GEOM.legs$ALENTH
-  leg.AWIDTH <- GEOM.legs$AWIDTH
-  leg.AHEIGHT <- GEOM.legs$AHEIT
+  leg.ALENGTH <- GEOM.legs$ALENTH - INSDEPDs[4] - INSDEPVs[4]
+  leg.AWIDTH <- GEOM.legs$AWIDTH - INSDEPDs[4] - INSDEPVs[4]
+  leg.AHEIGHT <- GEOM.legs$AHEIT - INSDEPDs[4] - INSDEPVs[4]
   leg.INSDEPD <- INSDEPDs[4]
   leg.INSDEPV <- INSDEPVs[4]
   leg.FATTHK <- GEOM.legs$FATTHK
@@ -104,7 +104,9 @@ plot_human <- function(
   plot.width <- c(-1.5, 1.5)
   trunk.left <- 0 - trunk.AWIDTH / 2
 
-  plot(plot.width, c(0, plot.height), type="n", main="saggital section / coronal section / transverse section", ylab = 'metres', xlab = 'metres', asp=1, xaxs = 'i', yaxs = 'i')
+  plot(plot.width, c(0, plot.height), type="n",
+       main="saggital section / coronal section / transverse section",
+       ylab = 'metres', xlab = 'metres', asp=1, xaxs = 'i', yaxs = 'i')
   #abline(v = 0, lty = 2)
 
   # trunk fur
@@ -127,7 +129,8 @@ plot_human <- function(
   draw.ellipse(c(0, 0),
                c(top.of.head,
                  top.of.head),
-               col = "pink", b = head.ASEMAJ - head.FATTHK, a = head.BSEMIN - head.FATTHK, lty = 0)
+               col = "pink", b = head.ASEMAJ - head.FATTHK,
+               a = head.BSEMIN - head.FATTHK, lty = 0)
   if(INSDEPVs[1] > 1e-9){
     draw.ellipse(c(0, 0), c(top.of.head, top.of.head),
                  b = head.ASEMAJ + INSDEPVs[1],
@@ -188,8 +191,10 @@ plot_human <- function(
   xright.arm.naked <- trunk.left - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3]
   ytop.arm.fur <- leg.ALENGTH + trunk.ALENGTH + INSDEPDs[3]
   ytop.arm.naked <- leg.ALENGTH + trunk.ALENGTH
-  ybottom.arm.fur <- head.ASEMAJ + leg.ALENGTH + INSDEPDs[4] + trunk.ALENGTH - arm.ALENGTH - INSDEPDs[3]
-  ybottom.arm.naked <- head.ASEMAJ + leg.ALENGTH + INSDEPDs[4] + trunk.ALENGTH - arm.ALENGTH
+  ybottom.arm.fur <- head.ASEMAJ + leg.ALENGTH +
+    INSDEPDs[4] + trunk.ALENGTH - arm.ALENGTH - INSDEPDs[3]
+  ybottom.arm.naked <- head.ASEMAJ + leg.ALENGTH + INSDEPDs[4] +
+    trunk.ALENGTH - arm.ALENGTH
   rect(xleft = xleft.arm.fur,
        ybottom = ybottom.arm.fur,
        xright = xright.arm.fur,
@@ -243,7 +248,8 @@ plot_human <- function(
   draw.ellipse(c(0, 0) - 1,
                c(top.of.head,
                  top.of.head),
-               col = "pink", b = head.ASEMAJ - head.FATTHK, a = head.CSEMIN - head.FATTHK, lty = 0)
+               col = "pink", b = head.ASEMAJ - head.FATTHK,
+               a = head.CSEMIN - head.FATTHK, lty = 0)
 
 
   # left leg
@@ -270,11 +276,13 @@ plot_human <- function(
   rect(xleft = trunk.left - 1,
        ybottom = leg.ALENGTH + INSDEPDs[4],
        xright = trunk.left + trunk.AWIDTH - 1,
-       ytop = leg.ALENGTH + trunk.ALENGTH + INSDEPDs[4], col = 'grey', lty = 2)
+       ytop = leg.ALENGTH + trunk.ALENGTH +
+         INSDEPDs[4], col = 'grey', lty = 2)
   rect(xleft = trunk.left - 1 + trunk.FATTHK,
        ybottom = leg.ALENGTH + INSDEPDs[4] + trunk.FATTHK,
        xright = trunk.left + trunk.AWIDTH - 1 - trunk.FATTHK,
-       ytop = leg.ALENGTH + trunk.ALENGTH + INSDEPDs[4] - trunk.FATTHK, col = 'pink', lty = 0)
+       ytop = leg.ALENGTH + trunk.ALENGTH + INSDEPDs[4] -
+         trunk.FATTHK, col = 'pink', lty = 0)
 
   # left arm
   xleft.arm.fur <- -arm.AWIDTH / 2 - INSDEPDs[3] - 1
@@ -343,14 +351,18 @@ plot_human <- function(
                  a = head.BSEMIN + INSDEPDs[1])
   }
   # arms
-  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
-                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 + arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
+  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 -
+                   arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
+                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 +
+                   arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
                c(0, 0) + top.height, col = "lightblue",
                b = arm.AWIDTH / 2 + INSDEPDs[3],
                a = arm.AWIDTH / 2 + INSDEPDs[3])
   if(INSDEPDs[4] < 0.0001){
-    draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
-                   trunk.AWIDTH / 2 + arm.AWIDTH / 2 + arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
+    draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 -
+                     arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
+                   trunk.AWIDTH / 2 + arm.AWIDTH / 2 +
+                     arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
                  c(0, 0) + top.height, col = "pink",
                  b = arm.AWIDTH / 2,
                  a = arm.AWIDTH / 2, lty = 2)
@@ -371,18 +383,24 @@ plot_human <- function(
                b = trunk.AWIDTH / 2 - trunk.FATTHK,
                a = trunk.AWIDTH / 2 - trunk.FATTHK, lty = 0)
   # arms
-  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
-                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 + arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
+  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 -
+                   arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
+                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 +
+                   arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
                c(0, 0) + mid.height, col = "lightblue",
                b = arm.AWIDTH / 2 + INSDEPDs[3],
                a = arm.AWIDTH / 2 + INSDEPDs[3])
-  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
-                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 + arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
+  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 -
+                   arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
+                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 +
+                   arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
                c(0, 0) + mid.height, col = "grey",
                b = arm.AWIDTH / 2,
                a = arm.AWIDTH / 2, lty = 2)
-  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 - arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
-                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 + arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
+  draw.ellipse(c(-trunk.AWIDTH / 2 - arm.AWIDTH / 2 -
+                   arm.AWIDTH / 4 - INSDEPDs[2] - INSDEPDs[3],
+                 trunk.AWIDTH / 2 + arm.AWIDTH / 2 +
+                   arm.AWIDTH / 4 + INSDEPDs[2] + INSDEPDs[3]) + 1,
                c(0, 0) + mid.height, col = "pink",
                b = arm.AWIDTH / 2 - arm.FATTHK,
                a = arm.AWIDTH / 2 - arm.FATTHK, lty = 2)
@@ -406,8 +424,8 @@ plot_human <- function(
                c(0, 0) + bottom.height, col = "pink",
                b = leg.AWIDTH / 2 - leg.FATTHK,
                a = leg.AWIDTH / 2 - leg.FATTHK, lty = 0)
-  height <- GEOM.heads$ALENTH + GEOM.trunks$ALENTH + GEOM.legs$ALENTH # m
-  abline(h = height + INSDEPDs[4], lty = 2)
+  height <- head.ASEMAJ*2 + INSDEPDs[4] + trunk.ALENGTH + leg.ALENGTH # m
+  abline(h = height, lty = 2)
   abline(h = HEIGHT / 100 + INSDEPDs[4], col = 'red', lty = 2)
   return(height)
 }

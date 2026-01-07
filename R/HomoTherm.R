@@ -22,6 +22,7 @@
 #' \strong{ Parameters controlling how the model runs:}\cr\cr
 #' \code{SIL.adjust}{ = TRUE, adjust silhouette area based on Underwood and Ward (1966)? (-)}\cr\cr
 #' \code{EXCEED.TCMAX}{ = TRUE, allow the mode to continue increasing core temperature? (-)}\cr\cr
+#' \code{DIFTOL}{ = 0.001, error tolerance for SIMULSOL (°C)}\cr\cr
 #' \code{MAXITER}{ = 500, maximum iterations beyond TC_MAX allowed when EXCEED.TMAX = TRUE}\cr\cr
 #'
 #' \strong{ Environment:}\cr\cr
@@ -47,10 +48,10 @@
 #' \code{DENSITYs}{ = rep(1050, 4), body density (kg/m^3)}\cr\cr
 #' \code{MASSFRACs}{ = c(0.0761, 0.501, 0.049, 0.162), fraction of total mass (-)}\cr\cr
 #' \code{AREAFRACs}{ = c(0.0829, 0.327, 0.110, 0.185), fraction of total surface area (-)}\cr\cr
-#' \code{PJOINs}{ = c(0.02628205, 0.08049954, 0.01923077, 0.03333333), fraction of part joined with rest of body (-)}\cr\cr
+#' \code{PJOINs}{ = c(0.02666667, 0.08088128, 0.02000000, 0.03333333), fraction of part joined with rest of body (-)}\cr\cr
 #' \code{SUBQFATs}{ = rep(1, 4), is subcutaneous fat present? (0 is no, 1 is yes)}\cr\cr
-#' \code{FATPCT}{ = c(5, 36, 10, 23), \% body fat}\cr\cr
-#' \code{SHAPE_Bs}{ = c(1.6, 1.85, 12.5, 6.5), ratio between long and short axis (-)}\cr\cr
+#' \code{FATPCTs}{ = c(5, 36, 10, 23) * 0.7, \% body fat}\cr\cr
+#' \code{SHAPE_Bs}{ = c(1.6, 1.9, 12, 7.0), ratio between long and short axis (-)}\cr\cr
 #' \code{FSKREFs}{ = c(0.50, 0.42, 0.35, 0.35), configuration factor to sky}\cr\cr
 #' \code{FGDREFs}{ = c(0.38, 0.42, 0.35, 0.35), reference configuration factor to ground}\cr\cr
 #' \code{EMISANs}{ = rep(0.98, 4), emissivity each body part (-)}\cr\cr
@@ -63,7 +64,7 @@
 #' \code{TC_INCs}{ = rep(0.04, 4), core temperature increment (°C)}\cr\cr
 #' \code{TC_MAXs}{ = rep(38, 4), maximum tolerated core temperature (°C)}\cr\cr
 #' \code{PCTWETs}{ = rep(1, 4), skin wettedness (\%)}\cr\cr
-#' \code{PCTWET_INCs}{ = c(0.5, 0.5, 0.75, 0.75), skin wettedness increment (\%)}\cr\cr
+#' \code{PCTWET_INCs}{ = c(1, 1, 1.5, 1.5), skin wettedness increment (\%)}\cr\cr
 #' \code{PCTWET_MAXs}{ = rep(100, 4), maximum skin surface area that can be wet (\%)}\cr\cr
 #' \code{CLOWETs}{ = rep(0, 4), insulation wettedness (\%)}\cr\cr
 #' \code{PCTBAREVAPs}{ = c(60, 0, 0, 0), bare area where free and forced evaporation can occur (\%)}\cr\cr
@@ -191,14 +192,14 @@ HomoTherm <- function(MASS = 70,
                       TC_ACTIVEs = rep(37.5, 4),
                       TC_MAXs = rep(38, 4),
                       EXCEED.TCMAX = TRUE,
-                      TC_INCs = rep(0.04, 4),
+                      TC_INCs = rep(0.05, 4),
                       DENSITYs = rep(1050, 4),
                       MASSFRACs = c(0.07609801, 0.50069348, 0.04932963, 0.16227462),
                       AREAFRACs = c(0.08291887, 0.32698460, 0.11025155, 0.18479669),
-                      SHAPE_Bs = c(1.6, 1.85, 12.5, 6.5),
-                      PJOINs = c(0.02628205, 0.08049954, 0.01923077, 0.03333333),
+                      SHAPE_Bs = c(1.6, 1.9, 12, 7.0),
+                      PJOINs = c(0.02666667, 0.08088128, 0.02000000, 0.03333333),
                       SUBQFATs =rep(1, 4),
-                      FATPCTs = c(5 * 0.1, 36 * 0.2, 10, 23),
+                      FATPCTs = c(5, 36, 10, 23) * 0.7,
                       KFLESHs = c(1.1, 0.9, 0.5, 0.5),
                       KFLESH_MAXs = rep(5, 4),
                       KFLESH_INCs = rep(0.05, 4),
@@ -218,7 +219,7 @@ HomoTherm <- function(MASS = 70,
                       FSKREFs = c(0.50, 0.42, 0.35, 0.35),
                       FGDREFs = c(0.38, 0.42, 0.35, 0.35),
                       PCTWETs = rep(1, 4),
-                      PCTWET_INCs = c(0.5, 0.5, 0.75, 0.75),
+                      PCTWET_INCs = rep(0.5, 4),
                       PCTWET_MAXs = rep(100, 4),
                       PCTBAREVAPs = c(60, 0, 0, 0),
                       MAXSWEAT = 0.75,
@@ -242,7 +243,8 @@ HomoTherm <- function(MASS = 70,
                       N2GAS = 79.02,
                       CO2GAS = 0.0422,
                       SIL.adjust = TRUE,
-                      MAXITER = 500){
+                      MAXITER = 500,
+                      DIFTOL = 0.001){
   # check if only one air temp / wind speed / relative humidity specified
   # needs one value for each body part so gradients with height can be
   # accounted for
@@ -250,7 +252,7 @@ HomoTherm <- function(MASS = 70,
   NPARTs <- c(1, 1, 2, 2) # one head, one trunk two arms and two legs
   PVENs <-  rep(0.5, 4) # make fraction ventral even
   ORIENTs = rep(0, 4) # don't orient perp or parallel to sun
-  AK1_SUBQFAT <- 0.51 # flesh conductivity value at which subcutaneous fat influence declines
+  AK1_SUBQFAT <- 0.5 # flesh conductivity value at which subcutaneous fat influence declines
   SUBQFAT_REDUCE <- 0.9 # factor by which subcutaneous fat influence is reduced
   INSDEPDs[INSDEPDs <= 0] <- 1e-9 # don't allow zero - can cause numerical problems
   INSDEPVs[INSDEPVs <= 0] <- 1e-9 # don't allow zero - can cause numerical problems
@@ -289,7 +291,7 @@ HomoTherm <- function(MASS = 70,
     # run human_silhouette_area function to obtain correction factor
     # to match empirical relationship in Underwood and Ward (1966)
     MASSs <- MASS * MASSFRACs
-    sil.out <- human_silhouette_area(ZENs = seq(0, 90),
+    sil.out <- NicheMapR:::human_silhouette_area(ZENs = seq(0, 90),
                               MASSs = MASSs,
                               DENSITYs = DENSITYs,
                               SHAPE_Bs = SHAPE_Bs,
@@ -421,11 +423,11 @@ HomoTherm <- function(MASS = 70,
                           FURTHRMK = FURTHRMK,
                           SHADE = SHADE,
                           FURWET = FURWET,
-                          ZFURCOMP = 0.5,
+                          ZFURCOMP = 1e-3,
                           ORIENT = ORIENT,
                           CONV_ENHANCE = CONV_ENHANCE,
                           Q10 = Q10,
-                          DIFTOL = 0.01)
+                          DIFTOL = DIFTOL)
     }
 
     # if first iteration, get surface area
@@ -538,7 +540,7 @@ HomoTherm <- function(MASS = 70,
     }
     # augment current vasoconstriction with sweating and core temperature rise
     if(min(c(TSKINDs, TSKINVs)) > 35){
-      PCTWETs <- PCTWETs + PCTWET_INC * 2
+      PCTWETs <- PCTWETs + PCTWET_INC * 10
       for(i in 1:length(TCs)){
         if(TCs[i] < TC_MAX){
           TCs[i] <- TCs[i] + TC_INC
