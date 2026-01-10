@@ -64,10 +64,10 @@
 #' \strong{ Part-specific physiological parameters (head, torso, arms, legs):}\cr\cr
 #' \code{TC_RESTs}{ = c(36.8, 36.8, 36.5, 36.7), resting core temperature (°C)}\cr\cr
 #' \code{TC_ACTIVEs}{ = rep(37.5, 4), active core temperature (°C)}\cr\cr
-#' \code{TC_INCs}{ = rep(0.04, 4), core temperature increment (°C)}\cr\cr
+#' \code{TC_INCs}{ = rep(0.05, 4), core temperature increment (°C)}\cr\cr
 #' \code{TC_MAXs}{ = rep(38, 4), maximum tolerated core temperature (°C)}\cr\cr
 #' \code{PCTWETs}{ = rep(1, 4), skin wettedness (\%)}\cr\cr
-#' \code{PCTWET_INCs}{ = c(1, 1, 1.5, 1.5), skin wettedness increment (\%)}\cr\cr
+#' \code{PCTWET_INCs}{ = rep(1, 4), skin wettedness increment (\%)}\cr\cr
 #' \code{PCTWET_MAXs}{ = rep(100, 4), maximum skin surface area that can be wet (\%)}\cr\cr
 #' \code{CLOWETs}{ = rep(0, 4), insulation wettedness (\%)}\cr\cr
 #' \code{PCTBAREVAPs}{ = c(60, 0, 0, 0), bare area where free and forced evaporation can occur (\%)}\cr\cr
