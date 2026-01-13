@@ -25,6 +25,8 @@ C    This subroutine computes a single unsegmented velocity and temperature prof
      & ,T0,TZO,USTAR
       double precision V,VEL,VV,X,X1,Y,Y1,YY,YY2,Z,Z0,Z01
       double precision Z02,ZEN,ZH,ZH1,ZH2,ZRATIO,ZZ,MAXSURF
+C     Added by Joel Treutlein, 13/01/26
+      double precision H, A_COEF, UH, TH
 
       INTEGER I,ITER,NAIR,I1,I2,I3,I4,I5,I6,I7,I8,I9,I10,I11,I12,I91,I92
      &,I93,I94,I95,I96,I97,I98,I99,I100,I101,I102,I103,I104,I105,I106
@@ -37,8 +39,8 @@ C    This subroutine computes a single unsegmented velocity and temperature prof
 
 C
 C**** 1 SEGMENT VELOCITY PROFILE - W. PORTER
-C**** VELOCITY PROFILE - Businger, J. A., Wyngaard, J. C., Izumi, Y., & Bradley, E. F. (1971). Flux-Profile Relationships in the Atmospheric Surface Layer. Journal of the Atmospheric Sciences, 28(2), 181–189. doi:10.1175/1520-0469(1971)028<0181:FPRITA>2.0.CO;2
-C**** SUBLAYER MODEL - Garratt, J. R., & Hicks, B. B. (1973). Momentum, heat and water vapour transfer to and from natural and artificial surfaces. Quarterly Journal of the Royal Meteorological Society, 99(422), 680–687. doi:10.1002/qj.49709942209
+C**** VELOCITY PROFILE - Businger, J. A., Wyngaard, J. C., Izumi, Y., & Bradley, E. F. (1971). Flux-Profile Relationships in the Atmospheric Surface Layer. Journal of the Atmospheric Sciences, 28(2), 181ï¿½189. doi:10.1175/1520-0469(1971)028<0181:FPRITA>2.0.CO;2
+C**** SUBLAYER MODEL - Garratt, J. R., & Hicks, B. B. (1973). Momentum, heat and water vapour transfer to and from natural and artificial surfaces. Quarterly Journal of the Royal Meteorological Society, 99(422), 680ï¿½687. doi:10.1002/qj.49709942209
 C     Z=REFERENCE HEIGHT
 C     Z0=ROUGHNESS HEIGHT
 C     T1=TEMPERATURE AT REFERENCE HEIGHT
@@ -96,6 +98,11 @@ C     COMPUTING VEL. PROFILE PARAMETERS FROM 200 CM REFERENCE VELOCITY
       STS=.62/(Z0*USTAR/12.)**.45 !SUBLAYER STANTON NO.
       STB=.64/DUM ! BULK STANTON NO.
       QC=RCP*DIFFT*USTAR*STB/(1+STB/STS) ! convective heat transfer at the surface
+
+C     Added by Joel Treutlein, 13/01/26
+C     CAMPBELL AND NORMAN (1998) CANOPY PARAMETERS
+      H = 10.0D0 * Z0        ! Canopy height = 10 * roughness height
+      A_COEF = 2.0D0         ! Surface attenuation coefficient
       
 C     Paul edit 9/12/19: adding alternative Campbell and Norman 1998 vertical air temperature profile calculation option
       IF(ZH.GT.0.D-8)THEN
@@ -165,11 +172,32 @@ C     CALC'S BELOW WHEN NO FREE CONV. ENHANCEMENT OF VEL,TEMP PROFILES
       IF(NAIR.LE.0) RETURN
       DO 4 I=1,NAIR
 C      FILL OUT VEL. AND TEMP. PROFILES
-       VV(I)=2.5*USTAR*dLOG(ZZ(I)/Z0+1.)
+C     Added by Joel Treutlein, 13/01/26
+C      CHECK IF HEIGHT IS BELOW CANOPY
+       IF(ZZ(I) .LT. H) THEN
+C       USE CAMPBELL AND NORMAN (1998) BELOW-CANOPY PROFILE
+        VV(I) = UH * dEXP(A_COEF * (ZZ(I)/H - 1.0D0))
+       ELSE
+C       USE STANDARD LOG PROFILE ABOVE CANOPY
+        VV(I)=2.5*USTAR*dLOG(ZZ(I)/Z0+1.)
+       ENDIF
+
        IF(ZH.EQ.0)THEN
 C       COMPUTING FICTITIOUS TEMP. AT TOP OF SUBLAYER
         TZO=(T1*STB+T3*STS)/(STB+STS)
-        T(I+20)=TZO+(T1-TZO)*dLOG(ZZ(I)/Z0+1.)/DUM
+
+C     Added by Joel Treutlein, 13/01/26
+C       CHECK IF HEIGHT IS BELOW CANOPY
+        IF(ZZ(I) .LT. H) THEN
+C         Calculate temperature at canopy height H first
+          TH = TZO+(T1-TZO)*dLOG(H/Z0+1.)/DUM
+C         Use exponential profile below canopy (similar to wind)
+          T(I+20) = T3 + (TH - T3) * dEXP(A_COEF * (ZZ(I)/H - 1.0D0))
+        ELSE
+C         Use standard log profile above canopy
+          T(I+20)=TZO+(T1-TZO)*dLOG(ZZ(I)/Z0+1.)/DUM
+        ENDIF
+
        ENDIF
     4 CONTINUE
       RETURN
